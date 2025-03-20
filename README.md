@@ -2,11 +2,13 @@
 
 This repo contains code examples of how to take the examples given in the [hugging face agents course](https://huggingface.co/agents-course), which often rely on the Hugging Face Cloud API, and adapt them to run locally. This repo assumes the local machine uses Apple Silicon with at least 48GB of unified RAM. The code is tested to work on a M4 Pro Mac Mini.
 
-If you have dual 24GB Nvidia GPUs and are running on linux, you should be able to use the code in this repo with little to no modification as well. If you have less ram, you'll have to use either a lower quantization or a smaller model than the default in this repo.
+If you have dual 24GB Nvidia GPUs and are running on linux, you should be able to use the code in this repo with little to no modification as well. If you have less ram, you'll have to use either a lower quantization or a smaller model than the default in this repo. If so, make sure you set the proper `.env` variables to reflect your choice (see step 9 in Initial Setup below).
 
-> **Note**: If you have less than 48GB of unified ram or have a lot of other applications in use, running the code as it might freeze your system. If you have exactly 48GB of ram, minimize the number of running apps and run `sudo sysctl iogpu.wired_limit_mb=40960` to dedicate 40GB of ram for the model, leaving 8GB for macos and other apps. Agents fill up the context window quickly and so this repo will be working with 32B parameter models and 32K context windows.
+> **Note**: If you have less than 48GB of unified ram or have a lot of other applications in use, running the code as it might freeze your system. If you have exactly 48GB of ram, minimize the number of running apps and run `sudo sysctl iogpu.wired_limit_mb=40960` to dedicate 40GB of ram for the model, leaving 8GB for macos and other apps.
+>
+> Agents fill up the context window quickly and so this repo will be working with 32B parameter models and 32K context windows and will need about 40GB of VRAM to run.
 
-## Initial setup
+## Initial Setup
 
 **Step 1.** Clone this repo and navigate into its root.
 
@@ -47,7 +49,9 @@ Python 3.13.1
 ollama pull hf.co/bartowski/Qwen2.5-Coder-32B-Instruct-GGUF:Q6_K_L
 ```
 
-> **Note** You can get find the command to download any specific quantization by clicking on the quantization and then selecting `Use this model -> Ollama` from [this](https://huggingface.co/bartowski/Qwen2.5-Coder-32B-Instruct-GGUF) page.
+> **Note**: You can get find the command to download any specific quantization by clicking on the quantization and then selecting `Use this model -> Ollama` from [this](https://huggingface.co/bartowski/Qwen2.5-Coder-32B-Instruct-GGUF) page.
+
+**Step 9.** Create a `.env` file in the repo's root and set the appropriate values using `.env.example` as a guide.
 
 ## Smolagents (Unit 2.1 in the course)
 
@@ -61,19 +65,17 @@ Assuming you've completed the Initial Setup above. You'll need to use two termin
 pip install 'smolagents[telemetry, docker]'
 ```
 
-**Step 2.** Start the telemtry server.
+**Step 2.** Start the telemtry server. It will take about 30 seconds to spin up.
 
 `python -m phoenix.server.main serve`
 
-> Note: It will take like 30 seconds to startup.
-
-**Step 3.** In the other terminal, navigate to the smolagents directory
+**Step 3.** In the other terminal, navigate to the smolagents directory.
 
 ```
 cd src/smolagents
 ```
 
-Then run the example agent.
+Then run the example agent that's been modified from the course to run locally in a sandboxed environment.
 
 ```
 python sandbox_run.py
@@ -81,7 +83,7 @@ python sandbox_run.py
 
 **Step 4.** Browse to http://127.0.0.1:6006/projects to see what the model is doing.
 
-> Note: It will take a moment to start seeing initial results for the agent's first step. On an M4 Pro with 20 GPU cores and the Q6_K_L version of a 32B model, it took about 20 seconds to see the first step and a bit over 5 minutes to complete the task in 5 steps. You can see my local agents results below.
+> **Note:** It will take a moment to start seeing initial results for the agent's first step. On an M4 Pro with 20 GPU cores and the Q6_K_L version of a 32B model, it took about 20 seconds to see the first step and a bit over 5 minutes to complete the task in 5 steps. You can see my local agents results below.
 >
 > <img src="/src/smolagents/results.png" title="smolagents phoenix telemetry results" alt="smolagents phoenix telemetry results">
 
